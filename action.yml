@@ -1,0 +1,24 @@
+name: Validate robot.yaml
+description: Checks a repository's robot.yaml against the robot.yaml standard of Robotheca, the open robot library.
+author: Robotheca
+branding:
+  icon: check-circle
+  color: blue
+inputs:
+  path:
+    description: Where robot.yaml is in the repository.
+    required: false
+    default: robot.yaml
+runs:
+  using: composite
+  steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: "22"
+    - name: Install the checker (pinned versions)
+      shell: bash
+      run: npm install --prefix "$GITHUB_ACTION_PATH" --no-save --no-audit --no-fund ajv@8.20.0 ajv-formats@3.0.1 yaml@2.9.1
+    - name: Check robot.yaml
+      shell: bash
+      run: node "$GITHUB_ACTION_PATH/validate.mjs" "${{ inputs.path }}"

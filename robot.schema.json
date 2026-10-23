@@ -1,0 +1,201 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://robotheca.org/schema/robot-0.1.json",
+  "title": "robot.yaml v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version",
+    "name",
+    "summary",
+    "category",
+    "difficulty",
+    "license",
+    "source"
+  ],
+  "properties": {
+    "format_version": { "const": "0.1" },
+    "name": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "summary": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "category": {
+      "enum": [
+        "arm",
+        "rover",
+        "humanoid",
+        "quadruped",
+        "drone",
+        "self_driving_scale",
+        "home",
+        "other"
+      ]
+    },
+    "difficulty": { "enum": ["beginner", "intermediate", "advanced"] },
+    "status": { "enum": ["idea", "in_progress", "built", "tested"] },
+    "license": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["hardware", "software"],
+      "properties": {
+        "hardware": { "type": "string", "minLength": 1 },
+        "software": { "type": "string", "minLength": 1 },
+        "documentation": { "type": "string", "minLength": 1 }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository"],
+      "properties": {
+        "repository": { "$ref": "#/$defs/webUrl" },
+        "ref": { "type": "string" }
+      }
+    },
+    "estimated_cost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["amount", "currency"],
+      "properties": {
+        "amount": { "type": "number", "minimum": 0 },
+        "currency": { "$ref": "#/$defs/currencyCode" }
+      }
+    },
+    "build_time_hours": { "type": "number", "minimum": 0 },
+    "print_time_hours": { "type": "number", "minimum": 0 },
+    "tools": { "type": "array", "items": { "type": "string" } },
+    "files": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "urdf": { "$ref": "#/$defs/repoPath" },
+        "parts_3d": { "$ref": "#/$defs/repoPath" },
+        "cad": { "$ref": "#/$defs/repoPath" },
+        "electronics": { "$ref": "#/$defs/repoPath" },
+        "bom": { "$ref": "#/$defs/repoPath" },
+        "docs": { "$ref": "#/$defs/repoPath" },
+        "simulation": { "$ref": "#/$defs/repoPath" },
+        "images": { "type": "array", "items": { "$ref": "#/$defs/repoPath" } }
+      }
+    },
+    "software": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "framework": { "type": "string" },
+        "ros_version": { "type": "string" }
+      }
+    },
+    "ai_models": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "url"],
+        "properties": {
+          "name": { "type": "string" },
+          "url": { "$ref": "#/$defs/webUrl" }
+        }
+      }
+    },
+    "specs": {
+      "type": "object",
+      "propertyNames": { "$ref": "#/$defs/freeKey" },
+      "additionalProperties": { "type": ["string", "number", "boolean"] }
+    },
+    "build_steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["title"],
+        "properties": {
+          "title": { "type": "string" },
+          "hours": { "type": "number", "minimum": 0 },
+          "doc": {
+            "description": "The step's instructions: a file in the repository.",
+            "$ref": "#/$defs/repoPath"
+          },
+          "url": {
+            "description": "The step's instructions when they are outside the repository (a docs site, a video). Give doc or url, not both.",
+            "$ref": "#/$defs/webUrl"
+          }
+        },
+        "not": {
+          "properties": { "doc": true, "url": true },
+          "required": ["doc", "url"]
+        }
+      }
+    },
+    "part_links": {
+      "type": "object",
+      "propertyNames": { "$ref": "#/$defs/freeKey" },
+      "additionalProperties": { "type": "integer", "minimum": 1 }
+    },
+    "tested": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "on_hardware": { "type": "boolean" },
+        "date": { "type": "string", "format": "date" }
+      }
+    },
+    "maintainers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string" },
+          "github": { "type": "string" }
+        }
+      }
+    },
+    "external_links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "url"],
+        "properties": {
+          "type": { "enum": ["bom", "docs", "video", "forum", "cad", "shop"] },
+          "url": { "$ref": "#/$defs/webUrl" },
+          "label": { "type": "string", "minLength": 1, "maxLength": 80 }
+        }
+      }
+    },
+    "closed_parts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "note"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "note": { "type": "string", "minLength": 1, "maxLength": 200 }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "webUrl": {
+      "description": "A web address. Only http:// and https:// links are allowed.",
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https?://"
+    },
+    "repoPath": {
+      "description": "A path relative to the repository root with / as separator, that stays inside the repository: no leading / or ~, no .. segment, no backslash, no scheme such as https: or C:, no control characters.",
+      "type": "string",
+      "pattern": "^(?![/~])(?![A-Za-z][A-Za-z0-9+.\\-]*:)(?!(?:.*/)?\\.\\.(?:/|$))[^\\\\\\x00-\\x1F]*$"
+    },
+    "currencyCode": {
+      "description": "An ISO 4217 currency code in capitals, such as EUR, USD or CNY.",
+      "type": "string",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "freeKey": {
+      "description": "Keys of free-form maps (specs, part_links). __proto__ is reserved.",
+      "not": { "const": "__proto__" }
+    }
+  }
+}
