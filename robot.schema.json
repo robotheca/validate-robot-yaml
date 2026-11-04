@@ -23,6 +23,7 @@
         "rover",
         "humanoid",
         "quadruped",
+        "hexapod",
         "drone",
         "self_driving_scale",
         "home",
